@@ -1,4 +1,4 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Query
 import pandas as pd
 
 app = FastAPI(title="NumInfo API")
@@ -26,28 +26,32 @@ def home():
     return {
         "developer": "@Mr_rahul_dev",
         "api_by": "@Rahuls_Portal",
-
         "status": "online",
         "records": len(df),
-
         "credits": "Developer @Mr_rahul_dev | API by @Rahuls_Portal"
     }
 
 
-@app.get("/lookup/{phone}")
-def lookup(phone: str):
-    phone = phone.strip()
+@app.get("/lookup")
+def lookup(num: str = Query(None, description="Phone number to lookup")):
+    if not num:
+        return {
+            "developer": "@Mr_rahul_dev",
+            "api_by": "@Rahuls_Portal",
+            "success": False,
+            "error": "Please provide phone number",
+            "credits": "Developer @Mr_rahul_dev | API by @Rahuls_Portal"
+        }
 
+    phone = num.strip()
     result = df[df["phone"] == phone]
 
     if result.empty:
         return {
             "developer": "@Mr_rahul_dev",
             "api_by": "@Rahuls_Portal",
-
             "success": False,
             "message": "Number not found",
-
             "credits": "Developer @Mr_rahul_dev | API by @Rahuls_Portal"
         }
 
@@ -56,7 +60,6 @@ def lookup(phone: str):
     return {
         "developer": "@Mr_rahul_dev",
         "api_by": "@Rahuls_Portal",
-
         "success": True,
         "data": {
             "first_name": row["first_name"],
@@ -74,6 +77,5 @@ def lookup(phone: str):
             "latitude": row["latitude"],
             "longitude": row["longitude"]
         },
-
         "credits": "Developer @Mr_rahul_dev | API by @Rahuls_Portal"
     }
